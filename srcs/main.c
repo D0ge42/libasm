@@ -2,12 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-extern long ft_strlen(const char *str);
-extern char *ft_strcpy(char *dst, const char *src);
+extern int ft_strcmp(const char *s1, const char *s2);
 
-int main()
+int main(int ac, char **av)
 {
-  const char *src = "String copied :)\n";
-  char *dest = malloc(ft_strlen(src) + 1);
-  printf("%s",ft_strcpy(dest,src));
+  int i = 0;
+  int res = ft_strcmp(av[1],av[2]);
+  printf("%i\n",res);
 }

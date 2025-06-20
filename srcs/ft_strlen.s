@@ -9,6 +9,8 @@
 ; in this case we don't use syscall since we let the caller decide what he wants to do with the
 ; result.
 ; if we used a syscall with 60 (exit) the value of len would be stored as exit code
+; finally section .note.GNU-stack purpose is to tell the compiler that the stack won't be executable
+; and it will only contain data. This is to preven buffer-overflow attacks.
 
 global ft_strlen
 

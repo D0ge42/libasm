@@ -15,8 +15,8 @@
 ; test al, al we use test (which is basically an & operator on al)
 ; it sets the cpu flag to 1 if both values are 0
 
-//0x00 & 0x00 = 0x00	ZF = 1	jne does NOT jump
-//0x41 & 0x41 = 0x41	ZF = 0	jne does jump
+;0x00 & 0x00 = 0x00	ZF = 1	jne does NOT jump
+;0x41 & 0x41 = 0x41	ZF = 0	jne does jump
 
 global ft_strcpy
 

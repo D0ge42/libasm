@@ -8,7 +8,8 @@ SRC_DIR = srcs
 OBJ_DIR = objs
 EXEC = program.c
 
-SRC = srcs/ft_strlen.s
+SRC = srcs/ft_strlen.s \
+	  srcs/ft_strcpy.s
 
 CSRCS = srcs/main.c
 

@@ -8,7 +8,7 @@
 ; in here we move the counter value (stored in rcx) into rdi. and we make the syscall
 ; in this case we don't use syscall since we let the caller decide what he wants to do with the
 ; result.
-; if we use a syscall the value of len would be stored as exit code
+; if we used a syscall with 60 (exit) the value of len would be stored as exit code
 
 global ft_strlen
 

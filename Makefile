@@ -9,6 +9,7 @@ OBJ_DIR = objs
 EXEC = program.c
 
 SRC = srcs/ft_strlen.s
+
 CSRCS = srcs/main.c
 
 OBJ = $(SRC:$(SRC_DIR)/%.s=$(OBJ_DIR)/%.o)

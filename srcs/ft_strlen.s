@@ -16,6 +16,8 @@ global ft_strlen
 
 section .text
 ft_strlen:
+  test rdi,rdi
+  jz err
   mov rsi, rdi
   xor rcx, rcx
 
@@ -29,5 +31,9 @@ ft_strlen:
   done:
     mov rax,rcx
     ret
+  err:
+    mov rax, 0x0
+    ret
+
 
 section .note.GNU-stack

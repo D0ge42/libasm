@@ -11,15 +11,19 @@
 ;This way i was able to copy back into rsi (2d registers for func param) the src string i had to
 ;copy.
 
+; for external libraries function like malloc from libc, we must use
+; wrt ..plt.
+; basically this tells the assembler this is a special symbol and that it has to use PLT
+; (procedure linkage table.) so that the dynamic linker ld.so can resolve it at runtime.
+; once the ld.so found the real address of malloc, it patches the GOT (GLobal offset table).
+; next calls, the PLT will directly uses updated GOT and jump straight to malloc.
+
 
 global ft_strdup
 extern malloc
 extern ft_strlen
 extern ft_strcpy
-
-section .data
-  msg db "Error: string is null", 0xa
-  msg_len equ $ - msg
+default rel
 
 section .text
 
@@ -35,7 +39,7 @@ section .text
   inc rsi ; + 1 for null terminator
   mov rbx, rdi ; move inside rdx the string so we can reuse it later for strcpy
   mov rdi, rsi ; inside rdi (first arg, we move the length)
-  call  malloc ; call to malloc with length of string as arg
+  call  malloc wrt ..plt; call to malloc with length of string as arg
   mov rdi, rax ; move the result of malloc (dest) inside the first arg of the next function (dest)
   mov rsi, rbx ; inside rsi we move the previously saved source
   call ft_strcpy ; now the result of malloc is in rax, and we move it to first arg (rdi)
@@ -45,15 +49,11 @@ section .text
   ret
 
   err:
-    mov rax, 0x1
-    mov rdi, 0x2
-    mov rsi, msg
-    mov rdx, msg_len
-    syscall
+  mov rsp, rbp ; epilogue on error aswell else the function doesn't know where to jump after returning
+  pop rbp
+  mov rax, 0x0 ; xoring rax in this case was not working because the rax register was filled with previous values
+  ret
 
-    mov rax, 0x3c
-    mov rdi, 0x1
-    syscall
 
 
 section .note.GNU-stack

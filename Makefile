@@ -1,15 +1,21 @@
 NAME = libasm.a
 
 ASM = nasm
-ASMFLAGS = -f elf64
+ASMFLAGS = -f elf64 -g -F dwarf
+CFLAGS = -g
 CC = gcc
 
 SRC_DIR = srcs
 OBJ_DIR = objs
-EXEC = program.c
+EXEC = test
 
 SRC = srcs/ft_strlen.s \
-	  srcs/ft_strcpy.s
+	  srcs/ft_strcpy.s \
+	  srcs/ft_strdup.s \
+	  srcs/ft_strcpy.s \
+	  srcs/ft_strcmp.s \
+	  srcs/ft_write.s \
+	  srcs/ft_read.s \
 
 CSRCS = srcs/main.c
 
@@ -25,15 +31,19 @@ $(NAME): $(OBJ)
 	$(AR) $@ $^
 
 exec: $(NAME)
-	$(CC) $(CFLAGS) $(TEST_SRC) -L. -lasm -o $(EXEC)
+	$(CC) $(CFLAGS) $(CSRCS) -L. -lasm -o $(EXEC)
 
-all: $(NAME)
+all: $(NAME) exec run
+
+run: $(EXEC)
+	./$(EXEC)
 
 clean:
 	rm -rf $(OBJ_DIR)
 
 fclean: clean
 	rm -f $(NAME)
+	rm -f $(EXEC)
 
 re: fclean all
 

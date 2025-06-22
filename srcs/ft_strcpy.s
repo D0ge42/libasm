@@ -22,6 +22,8 @@ global ft_strcpy
 
 section .text
 ft_strcpy:
+  test rsi, rsi
+  je err
   mov rdx, rsi ; move 2nd arg (src) into rdx.
   mov rcx, rdi ; move 1st arg (dest) into rcx.
 
@@ -34,6 +36,9 @@ ft_strcpy:
     jne loop_start
 
     mov rax,rdi
+    ret
+  err:
+    mov rax, 0
     ret
 
 section .note.GNU-stack

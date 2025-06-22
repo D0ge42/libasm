@@ -18,9 +18,13 @@
 
 
 global ft_read
+extern __ernno_location
 
 section .text
 ft_read:
+  movsx rdi,edi
+  cmp rdi,0
+  jl err_fd
 
   push rbp      ; prologue
   mov rbp, rsp  ; prologue
@@ -30,6 +34,9 @@ ft_read:
 
   mov rsp, rbp ; epilogue
   pop rbp      ; epilogue
+  ret
+err_fd:
+  mov rax, -1
   ret
 
 section .note.GNU-stack

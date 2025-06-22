@@ -1,4 +1,5 @@
 global ft_strcmp
+default rel
 
 section .data
   err dw "Please, provide two args", 0xA
@@ -30,7 +31,7 @@ ft_strcmp:
     error:
     mov rax, 1
     mov rdi, 2
-    mov rsi, err
+    lea rsi, err
     mov rdx, err_len
     syscall
 

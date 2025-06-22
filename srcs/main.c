@@ -52,7 +52,7 @@ void test_strlen()
   printf("Length = 0, Ok ✅ \n");
 
   printf("Testing ft_strlen with NULL string: ");
-  assert(ft_strlen(NULL) == 0); // Assuming your function handles NULL safely
+  assert(ft_strlen(NULL) == 0);
   printf("Length = 0, Ok ✅ \n");
 
   printf("Testing ft_strlen with normal string: ");

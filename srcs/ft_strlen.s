@@ -28,5 +28,6 @@ ft_strlen:
 
   done:
     mov rax,rcx
+    ret
 
 section .note.GNU-stack

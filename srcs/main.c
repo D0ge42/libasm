@@ -120,7 +120,7 @@ void test_write()
   written = ft_write(-1, "test", 4);
   printf("%zi\n",written);
   assert(written == (size_t)-1);
-  printf("Returned -1 as expected, Ok ✅ \n");
+  printf("Returned -1 as expected, errno = %i Ok ✅ \n", errno);
 }
 
 void test_read()
@@ -139,9 +139,10 @@ void test_read()
   close(fd);
   remove("test_read_file.txt");
 
-  printf("Testing ft_read with invalid fd: ");
   errno = 0;
+  printf("Testing ft_read with invalid fd: ");
   read_bytes = ft_read(-1, buf, 10);
   assert(read_bytes == (size_t)-1);
-  printf("Returned -1 as expected, Ok ✅ \n");
+  read_bytes = ft_read(-1, buf, 10);
+  printf("Returned -1 as expected, errno = %i Ok ✅ \n",errno);
 }

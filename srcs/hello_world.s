@@ -1,11 +1,6 @@
 section .data
 default rel
 
-
-
-
-
-
   msg dw "Hello world", 0xA
   msg_l equ $ - msg
 

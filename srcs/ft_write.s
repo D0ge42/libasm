@@ -6,7 +6,8 @@
 ; It is the process of converting a smaller signed value into a larger signed value (Example from 32-bit to 64-bit) while preserving its sign (positive or negative).
 ;without Sign extension
 ;mov rdi, edi
-; rdi = 0x00000000FFFFFFFF   → this is +4294967295 in 64-bit
+; rdi = 0x00000000FFFFFFFF   → this is +4294967295 in 64-bit (-1 in 32 bit not considering the
+; zeroes)
 
 ;with sign extension
 ;movsx rdi, edi
@@ -14,6 +15,7 @@
 
 global ft_write
 default rel
+extern __errno_location
 
 section .data
   err_msg db "NULL string can't be written", 0xa
@@ -43,6 +45,8 @@ section .text
     mov rdi, 0x1
     syscall
   err_fd:
+    call __errno_location wrt ..plt
+    mov dword[rax], 0x4
     mov rax, -1
     ret
 

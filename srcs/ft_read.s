@@ -15,19 +15,22 @@
 ;Pops the base pointer off the stack, so it is restored to its value before the prologue.
 ;Returns to the calling function, by popping the previous frame's program counter off the stack and jumping to it.
 
+;errno works with 32 bit signed integers i believe, so we must set dword[rax](value pointed by the
+;memory address) to a 32bit positive integer, indicating the error.
+
 
 
 global ft_read
-extern __ernno_location
+extern __errno_location
 
 section .text
 ft_read:
+  push rbp      ; prologue
+  mov rbp, rsp  ; prologue
   movsx rdi,edi
   cmp rdi,0
   jl err_fd
 
-  push rbp      ; prologue
-  mov rbp, rsp  ; prologue
 
   mov rax, 0  ; read
   syscall
@@ -35,8 +38,13 @@ ft_read:
   mov rsp, rbp ; epilogue
   pop rbp      ; epilogue
   ret
+
 err_fd:
+  call __errno_location wrt ..plt
+  mov dword[rax], 11
   mov rax, -1
+  mov rsp, rbp ; epilogue
+  pop rbp      ; epilogue
   ret
 
 section .note.GNU-stack

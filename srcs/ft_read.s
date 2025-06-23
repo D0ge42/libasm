@@ -31,6 +31,9 @@ ft_read:
   cmp rdi,0
   jl err_fd
 
+  movsx rdx,edx
+  cmp rdx,0
+  jl enegcount
 
   mov rax, 0  ; read
   syscall
@@ -41,10 +44,17 @@ ft_read:
 
 err_fd:
   call __errno_location wrt ..plt
-  mov dword[rax], 11
+  mov dword[rax], 0x9
   mov rax, -1
   mov rsp, rbp ; epilogue
   pop rbp      ; epilogue
+  ret
+enegcount:
+  call __errno_location wrt ..plt
+  mov dword[rax], 0x16
+  mov rax, -1
+  mov rsp, rbp ; overwrite the stack pointer with  base pointer
+  pop rbp   ; pop base pointer to original state
   ret
 
 section .note.GNU-stack

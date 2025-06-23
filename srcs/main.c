@@ -111,16 +111,23 @@ void test_strcmp()
 
 void test_write()
 {
+  errno = 0;
   printf("Testing ft_write with STDOUT: ");
   ssize_t written = ft_write(1, "Hello from ft_write\n", 20);
   assert(written == 20);
-  printf("Bytes written = %zd, Ok ✅ \n", written);
+  printf("Bytes written = %zd, errno = %i, Ok ✅ \n", written, errno);
 
+  errno = 0;
   printf("Testing ft_write with invalid fd: ");
   written = ft_write(-1, "test", 4);
-  printf("%zi\n",written);
   assert(written == (size_t)-1);
-  printf("Returned -1 as expected, errno = %i Ok ✅ \n", errno);
+  printf("Bytes written = %zd, errno = %i, Ok ✅ \n", written, errno);
+
+  errno = 0;
+  printf("Testing ft_write with negative count: ");
+  written = ft_write(1, "Hello from ft_write\n", -10);
+  assert(written == (size_t)-1);
+  printf("Bytes written = %zd, errno = %i, Ok ✅ \n", written, errno);
 }
 
 void test_read()
@@ -135,7 +142,7 @@ void test_read()
   ssize_t read_bytes = ft_read(fd, buf, 14);
   assert(read_bytes == 13);
   buf[read_bytes] = '\0';
-  printf("Read content = \"%s\", Ok ✅ \n", buf);
+  printf("Read content = \"%s\", errno = %i, Ok ✅ \n", buf, errno);
   close(fd);
   remove("test_read_file.txt");
 
@@ -144,5 +151,10 @@ void test_read()
   read_bytes = ft_read(-1, buf, 10);
   assert(read_bytes == (size_t)-1);
   read_bytes = ft_read(-1, buf, 10);
+  printf("Returned -1 as expected, errno = %i Ok ✅ \n",errno);
+
+  printf("Testing ft_read with negative count: ");
+  read_bytes = ft_read(1, buf, -42);
+  assert(read_bytes == (size_t)-1);
   printf("Returned -1 as expected, errno = %i Ok ✅ \n",errno);
 }

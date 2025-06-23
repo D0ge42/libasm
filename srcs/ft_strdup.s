@@ -23,6 +23,7 @@ global ft_strdup
 extern malloc
 extern ft_strlen
 extern ft_strcpy
+extern __errno_location
 default rel
 
 section .text
@@ -40,6 +41,8 @@ section .text
   mov rbx, rdi ; move inside rdx the string so we can reuse it later for strcpy
   mov rdi, rsi ; inside rdi (first arg, we move the length)
   call  malloc wrt ..plt; call to malloc with length of string as arg
+  test rax, rax
+  je err
   mov rdi, rax ; move the result of malloc (dest) inside the first arg of the next function (dest)
   mov rsi, rbx ; inside rsi we move the previously saved source
   call ft_strcpy ; now the result of malloc is in rax, and we move it to first arg (rdi)
@@ -51,6 +54,8 @@ section .text
   err:
   mov rsp, rbp ; epilogue on error aswell else the function doesn't know where to jump after returning
   pop rbp
+  call __errno_location wrt ..plt
+  mov dword[rax], 0xC
   mov rax, 0x0 ; xoring rax in this case was not working because the rax register was filled with previous values
   ret
 

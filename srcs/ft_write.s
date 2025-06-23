@@ -23,6 +23,8 @@ section .data
 
 section .text
   ft_write:
+    push rbp
+    mov rbp, rsp
     test rsi,rsi ; check for null string
     jz err ; go err label if its null
 
@@ -30,8 +32,15 @@ section .text
     cmp rdi, 0 ; check for negative value
     jl err_fd ; if sign flag is set, jump to err_fd
 
+    movsx rdx, edx
+    cmp rdx, 0
+    jl enegcount
+
+
     mov rax, 0x1
     syscall
+    mov rsp, rbp ; overwrite the stack pointer with  base pointer
+    pop rbp   ; pop base pointer to original state
     ret
 
   err:
@@ -43,12 +52,24 @@ section .text
 
     mov rax, 60
     mov rdi, 0x1
+    mov rsp, rbp ; overwrite the stack pointer with  base pointer
+    pop rbp   ; pop base pointer to original state
     syscall
   err_fd:
     call __errno_location wrt ..plt
-    mov dword[rax], 0x4
+    mov dword[rax], 0x9
+    mov rax, -1
+    mov rsp, rbp ; overwrite the stack pointer with  base pointer
+    pop rbp   ; pop base pointer to original state
+    ret
+  enegcount:
+    call __errno_location wrt ..plt
+    mov dword[rax], 0x16
+    mov rsp, rbp ; overwrite the stack pointer with  base pointer
+    pop rbp   ; pop base pointer to original state
     mov rax, -1
     ret
+
 
 
 section .note.GNU-stack

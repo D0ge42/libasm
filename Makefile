@@ -16,8 +16,9 @@ SRC = srcs/ft_strlen.s \
 	  srcs/ft_strcmp.s \
 	  srcs/ft_write.s \
 	  srcs/ft_read.s \
+	  srcs/ft_atoi_base.s \
 
-CSRCS = srcs/main.c
+CSRCS = srcs/main2.c
 
 OBJ = $(SRC:$(SRC_DIR)/%.s=$(OBJ_DIR)/%.o)
 
@@ -33,7 +34,7 @@ $(NAME): $(OBJ)
 exec: $(NAME)
 	$(CC) $(CFLAGS) $(CSRCS) -L. -lasm -o $(EXEC)
 
-all: $(NAME) exec run
+all: $(NAME) exec
 
 run: $(EXEC)
 	./$(EXEC)

@@ -38,7 +38,6 @@ ft_atoi_base:
 
   ; check base_len
   mov rdi, r12
-  mov r14, r12
   call ft_strlen
   cmp rax, 0x1
   je l_base_len_err
@@ -62,12 +61,15 @@ ft_atoi_base:
   je l_base_err
 
   ;loops to check if curr char is duplicated in the base
-  l_double_check:
-  mov bl, [r12 + 4]
+  mov r14, r12 ; copy from current char to end into r14
+  l2_dup:
+  inc r14 ; increment and check next char
+  mov bl, [r14] ; see if we've reached the end
   test bl, bl
-
-  cmp al, bl
-  je l_duplicate
+  je l_done_checking
+  cmp bl, al
+  je l_duplicate_err
+  jmp l2_dup
 
   l_done_checking:
   inc r12 ; inc r12

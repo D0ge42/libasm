@@ -38,6 +38,7 @@ ft_atoi_base:
 
   ; check base_len
   mov rdi, r12
+  mov r14, r12
   call ft_strlen
   cmp rax, 0x1
   je l_base_len_err
@@ -60,11 +61,31 @@ ft_atoi_base:
   cmp al, 0x20
   je l_base_err
 
+  ;loops to check if curr char is duplicated in the base
+  l_double_check:
+  mov bl, [r12 + 4]
+  test bl, bl
+
+  cmp al, bl
+  je l_duplicate
+
+  l_done_checking:
   inc r12 ; inc r12
   jmp l2 ; loop again
 
   l_ok:
     ret
+
+  l_duplicate_err:
+  mov rax, 0x1
+  mov rdi, 0x2
+  lea rsi, ERR_DUP
+  mov rdx, ERR_DUP_LEN
+  syscall
+
+  mov rax, 60
+  mov rdi, 1
+  syscall
 
   l_base_err:
   mov rax, 0x1
@@ -115,6 +136,9 @@ section .data
 
   ERR_BTS db "Error: base has to contain at least 2 hexadecimal values", 0xa
   ERR_BTS_LEN equ $- ERR_BTS
+
+  ERR_DUP db "Error: base has duplicates", 0xa
+  ERR_DUP_LEN equ $- ERR_BTS
 
 section .rodata
   fmt db "%s", 0xA

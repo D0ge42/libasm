@@ -13,9 +13,11 @@ ft_atoi_base:
   push rbp ; +8
   mov rbp, rsp
 
-  mov r12, rsi ; save string in calle-saved register.
-  mov rsi, rdi ; store str in 2nd arg of printf
-  mov r13, rdi ; save string in calle-saved register.
+  mov r12, rsi ; save base in calle-saved register.
+  mov r10, rsi ; save base
+  mov r11, rsi ; save base
+  mov rsi, rdi ; store string to convert in 2nd arg of printf
+  mov r13, rdi ; save string-to-convert in calle-saved register.
 
   lea rdi, [fmt] ; put fmt value inside rdi
   call printf wrt ..plt ; call printf + 8 but -8 when ret
@@ -23,19 +25,59 @@ ft_atoi_base:
   mov rsi, r13 ;
   call f_skip_wspaces ; this should return updated pointer to rsi
 
-  lea rdi, [fmt]
+  lea rdi, [fmt] ; load effective address of into rdi of fmt
 
   call printf wrt ..plt
 
-  call f_check_base
+  call f_check_base ; check base for errors
+
+  mov rdi, rsi ; we don't need fmt anymore. We can replace first arg with the actual ptr of string.
+  sub rsp, 24
+
 
   mov rsp, rbp
   pop rbp
   ret
 
 
-  f_check_base:
+  f_conversion:
+  mov dword[rbp - 8], 1 ; sign
+  call ft_strlen
+  mov dword[rbp - 16], eax ; len of string
+  mov dword[rbp - 24], 0 ; num
+    l_conv:
+    xor al, al
+    mov al, [rdi]
+    cmp al, 0x2D
+    je lb_sign
 
+
+    f_has_char:
+      l3_has_char:
+      mov cl, [r11]
+      test cl, cl
+      je c_not_found
+      cmp al, cl
+      je ret_idx
+      inc r11
+      jmp l3_has_char
+
+      ret_idx:
+      mov rax, r11
+      sub rax, r10
+
+      je c_not_found
+      mov rax, -1
+
+
+
+
+    lb_sign:
+    neg [rbp -  8]
+
+
+
+  f_check_base:
   ; check base_len
   mov rdi, r12
   call ft_strlen

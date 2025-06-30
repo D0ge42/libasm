@@ -1,4 +1,5 @@
 global ft_atoi_base
+extern ft_strlen
 default rel
 
 section .text
@@ -15,19 +16,110 @@ section .text
   cmp rax, -1
   je ft_atoi_base_err
 
+  sub rsp, 24 ; + 24 bytes allocated for variables on stack
+  mov r9, rdi ; save string to convert on r9
+  mov rdi, rsi ; copy base on first arg
 
-  ; epilogue: -8 bytes
-  mov rsp, rbp
-  pop rbp
+    calculate:
 
-  ret
+      mov dword[rbp - 8], 0 ; num
+      mov dword[rbp - 16], 1 ; sign
+      mov dword[rbp - 24], 0 ; base len
 
-  ft_atoi_base_err:
+      call ft_strlen ; call strlen on "base" rdi
+      mov rdi, r9 ; restore rdi to be string to convert
+      mov dword[rbp -24], eax ; store base len inside r9
+      xor r9, r9 ; clear r9 register.
 
-  ; epilogue: -8 bytes
-  mov rsp, rbp
-  pop rbp
-  ret
+    main_loop:
+
+      xor al, al ; clear al register
+      mov al, [rdi] ; store curr char inside al
+      test al, al ; check for null
+      je conv_done
+
+      cmp al, 0x2D ; check for minus
+      je sign ; if equal jump to sign label and handles it
+
+      mov rdx, rsi ; store current orig pointer inside rdx
+      call has_char ; call has_char function
+
+      cmp rax, 0x0
+      je go_next
+
+        conversion_loop:
+        mov al, [rdi] ; move current char of to_convert(rdi reg) inside al
+
+        test al, al ; check for end of string
+        jmp end
+
+       call has_char ; call has_char func
+        mov r10, rax ;store index and curr result of fchar function
+
+        cmp r10, 0 ; check if current char is not inside the given base
+        je end
+
+        mov rax, [rbp - 8] ; move current num inside rax
+        mul dword[rbp - 24] ; multiply num by base len
+        add rax, r10 ; add index inside base to num
+        inc rdi
+        jmp conversion_loop
+
+    end:
+    mul dword[rbp - 16] ; multiply rax by sign
+    jmp conv_done ; end conversion
+
+    conv_done:
+      ; epilogue: -8 bytes
+      mov rsp, rbp
+      pop rbp
+      ret
+
+    sign:
+      mov eax, dword[rbp - 16] ; store current sign inside eax
+      neg eax; multiply eax by  - 1
+      mov dword[rbp - 16], eax ; store result inside rpb - 16
+      inc rdi
+      jmp main_loop
+
+    go_next:
+      inc rdi
+      jmp main_loop
+
+    ft_atoi_base_err:
+      ; epilogue: -8 bytes
+      mov rsp, rbp
+      pop rbp
+      ret
+
+
+  ; @brief function to check if a char is present in a certain base
+  ; @args rdi, char to check
+  ;       rsi, base to check against
+  ; @return index on success else 0
+  has_char:
+
+    loop_has_char:
+      mov ebx, 0 ; index
+      xor bl, bl ; clear bl register
+      mov bl, [rsi] ; mov curr char inside rdi
+
+      test bl, bl
+      je not_found
+
+      cmp al, bl; check if curr char is inside given base
+      je found
+      inc ebx
+      inc rsi
+      jmp loop_has_char
+
+    found:
+      mov rax, rbx
+      ret
+
+    not_found:
+      mov rax, 0
+      ret
 
   ; @brief Function used to skip white spaces
   ; @args register where pointer to string is saved
@@ -100,14 +192,11 @@ section .text
     lea rsi, INV_BASE ; use lea to avoid compile time error PIE
     mov rdx, INV_BASE_LEN
     syscall
-    ret -1
-
-
-
+    mov rax, -1
+    ret
 
 section .rodata
   INV_BASE db "Error: Invalid base", 0xA
   INV_BASE_LEN equ $ - INV_BASE
-
 
 section .note.GNU-stack

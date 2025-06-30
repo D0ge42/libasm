@@ -11,6 +11,7 @@ section .text
 
   call skip_white_spaces
 
+  mov r15, rdi
   call check_base
 
   cmp rax, -1
@@ -18,6 +19,7 @@ section .text
 
   sub rsp, 24 ; + 24 bytes allocated for variables on stack
   mov r9, rdi ; save string to convert on r9
+  mov rsi, r15
   mov rdi, rsi ; copy base on first arg
 
     calculate:
@@ -27,7 +29,7 @@ section .text
       mov dword[rbp - 24], 0 ; base len
 
       call ft_strlen ; call strlen on "base" rdi
-      mov rdi, r9 ; restore rdi to be string to convert
+      mov rdi, r15 ; restore rdi to be string to convert
       mov dword[rbp -24], eax ; store base len inside r9
       xor r9, r9 ; clear r9 register.
 
@@ -142,7 +144,7 @@ section .text
       je skip
       cmp al, 0xD ; check for carriage ret
       je skip
-      ret ; increased rdi
+      ret
 
       done_skipping:
       ret

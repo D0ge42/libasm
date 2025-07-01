@@ -52,9 +52,8 @@ section .text
       je sign ; if equal jump to sign label and handles it
 
       mov rsi, r15 ; restore rsi to original base
-      mov rdx, rsi ; store current orig pointer inside rdx --> RSI IS EMPTY!!!
       call has_char ; call has_char function
-      mov rsi, rdx
+      mov rsi, r15
 
       cmp rax, 0x0 ; FIXED
       je go_next
@@ -66,7 +65,6 @@ section .text
         je end
 
         call has_char ; call has_char func
-        mov rsi, rdx ; restore original base
         mov r10, rax ;store index and curr result of fchar function
 
         cmp r10, -1  ; THIS SHOULD NOT TRIGGER WHEN BASE IS 0.
@@ -75,7 +73,7 @@ section .text
         mov rax, qword[rbp - 8] ; move current num inside rax
         mul qword[rbp - 24] ; multiply num by base len
         add rax, r10 ; add index inside base to num
-        add [rbp - 8], rax
+        mov [rbp - 8], rax
         inc rdi
         jmp conversion_loop
 
@@ -119,10 +117,11 @@ section .text
   ;       rsi, base to check against
   ; @return index on success else 0
   has_char:
+    mov rsi, r15; restore original base
     mov ebx, 0 ; index
     loop_has_char:
       xor bl, bl ; clear bl register
-      mov bl, [rsi] ; mov curr char inside rdi
+      mov bl, [rsi] ; mov curr base char inside bl --> seg fault with 3 or more char !!!!
 
       test bl, bl
       je not_found

@@ -17,7 +17,7 @@ SRC = srcs/ft_strlen.s \
 	  srcs/ft_read.s \
 	  srcs/ft_atoi_base.s
 
-CSRCS = srcs/main2.c
+CSRCS = srcs/main_bonus.c
 
 OBJ = $(SRC:$(SRC_DIR)/%.s=$(OBJ_DIR)/%.o)
 

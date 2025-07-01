@@ -9,6 +9,9 @@ section .text
   push rbp
   mov rbp, rsp
 
+  test rdi, rdi ; check if str to convert is null
+  je ft_atoi_base_err
+
   call skip_white_spaces
 
   mov r15, rsi ; save original base
@@ -31,7 +34,6 @@ section .text
       mov qword[rbp - 16], 1 ; sign
       mov qword[rbp - 24], 0 ; base len
 
-
       call ft_strlen ; call strlen on "base" rdi
 
       cmp rax, 1
@@ -52,7 +54,7 @@ section .text
       je sign ; if equal jump to sign label and handles it
 
       mov rsi, r15 ; restore rsi to original base
-      call has_char ; call has_char function
+      call has_char ; call has_char function --> returning Hexa 0x11 -> 17 in decimal
       mov rsi, r15
 
       cmp rax, 0x0 ; FIXED
@@ -84,6 +86,7 @@ section .text
 
     conv_done:
       ; epilogue: -8 bytes
+      add rsp, 24
       mov rsp, rbp
       pop rbp
       ret
@@ -118,27 +121,26 @@ section .text
   ; @return index on success else 0
   has_char:
     mov rsi, r15; restore original base
-    mov ebx, 0 ; index
+    xor ecx, ecx
     loop_has_char:
       xor bl, bl ; clear bl register
-      mov bl, [rsi] ; mov curr base char inside bl --> seg fault with 3 or more char !!!!
+      mov bl, [rsi] ; mov curr base char inside bl
 
       test bl, bl
       je not_found
 
       cmp al, bl; check if curr char is inside given base
       je found
-      inc ebx
+      inc ecx
       inc rsi
       jmp loop_has_char
 
     found:
-      mov rax, rbx
-      sub rax, 48
+      mov eax, ecx
       ret
 
     not_found:
-      mov rax, -1
+      mov eax, -1
       ret
 
   ; @brief Function used to skip white spaces

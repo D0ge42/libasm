@@ -1,6 +1,7 @@
 #include <stdio.h>
 
-extern int ft_atoi_base(const char *str, const char *base);
+// extern int ft_atoi_base(const char *str, const char *base);
+int ft_atoi_base(char *str, char *base);
 
 int main(int ac, char **av)
 {
@@ -8,4 +9,3 @@ int main(int ac, char **av)
   printf("%i\n",result);
   return 0;
 }
-

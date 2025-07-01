@@ -11,7 +11,7 @@ section .text
 
   call skip_white_spaces
 
-  mov r15, rdi
+  mov r15, rsi ; save original base
   call check_base
 
   cmp rax, -1
@@ -19,17 +19,25 @@ section .text
 
   sub rsp, 24 ; + 24 bytes allocated for variables on stack
   mov r9, rdi ; save string to convert on r9
-  mov rsi, r15
-  mov rdi, rsi ; copy base on first arg
+  mov rdi, r15 ; copy base on first arg
+
+  ; r9 hold string to convert
+  ; r15 orig base
+  ; rdi orig base
 
     calculate:
 
-      mov dword[rbp - 8], 0 ; num
-      mov dword[rbp - 16], 1 ; sign
-      mov dword[rbp - 24], 0 ; base len
+      mov qword[rbp - 8], 0 ; num
+      mov qword[rbp - 16], 1 ; sign
+      mov qword[rbp - 24], 0 ; base len
+
 
       call ft_strlen ; call strlen on "base" rdi
-      mov rdi, r15 ; restore rdi to be string to convert
+
+      cmp rax, 1
+      jle ft_atoi_base_err
+
+      mov rdi, r9 ; restore rdi to be string to convert
       mov dword[rbp -24], eax ; store base len inside r9
       xor r9, r9 ; clear r9 register.
 
@@ -43,32 +51,37 @@ section .text
       cmp al, 0x2D ; check for minus
       je sign ; if equal jump to sign label and handles it
 
-      mov rdx, rsi ; store current orig pointer inside rdx
+      mov rsi, r15 ; restore rsi to original base
+      mov rdx, rsi ; store current orig pointer inside rdx --> RSI IS EMPTY!!!
       call has_char ; call has_char function
+      mov rsi, rdx
 
-      cmp rax, 0x0
+      cmp rax, 0x0 ; FIXED
       je go_next
 
         conversion_loop:
         mov al, [rdi] ; move current char of to_convert(rdi reg) inside al
 
-        test al, al ; check for end of string
-        jmp end
-
-       call has_char ; call has_char func
-        mov r10, rax ;store index and curr result of fchar function
-
-        cmp r10, 0 ; check if current char is not inside the given base
+        test al, al ; check for end of string --> NOT WORKING? this is going straight to end: label
         je end
 
-        mov rax, [rbp - 8] ; move current num inside rax
-        mul dword[rbp - 24] ; multiply num by base len
+        call has_char ; call has_char func
+        mov rsi, rdx ; restore original base
+        mov r10, rax ;store index and curr result of fchar function
+
+        cmp r10, -1  ; THIS SHOULD NOT TRIGGER WHEN BASE IS 0.
+        je end
+
+        mov rax, qword[rbp - 8] ; move current num inside rax
+        mul qword[rbp - 24] ; multiply num by base len
         add rax, r10 ; add index inside base to num
+        add [rbp - 8], rax
         inc rdi
         jmp conversion_loop
 
     end:
-    mul dword[rbp - 16] ; multiply rax by sign
+    mov rax, [rbp - 8]
+    mul qword[rbp - 16] ; multiply rax by sign
     jmp conv_done ; end conversion
 
     conv_done:
@@ -92,6 +105,12 @@ section .text
       ; epilogue: -8 bytes
       mov rsp, rbp
       pop rbp
+      mov rax, 1 ; write syscall
+      mov rdi, 2 ; fd err
+      lea rsi, INV_BASE_L ; use lea to avoid compile time error PIE
+      mov rdx, INV_BASE_LEN_N
+      syscall
+      mov rax, -1
       ret
 
 
@@ -100,9 +119,8 @@ section .text
   ;       rsi, base to check against
   ; @return index on success else 0
   has_char:
-
+    mov ebx, 0 ; index
     loop_has_char:
-      mov ebx, 0 ; index
       xor bl, bl ; clear bl register
       mov bl, [rsi] ; mov curr char inside rdi
 
@@ -117,10 +135,11 @@ section .text
 
     found:
       mov rax, rbx
+      sub rax, 48
       ret
 
     not_found:
-      mov rax, 0
+      mov rax, -1
       ret
 
   ; @brief Function used to skip white spaces
@@ -200,5 +219,8 @@ section .text
 section .rodata
   INV_BASE db "Error: Invalid base", 0xA
   INV_BASE_LEN equ $ - INV_BASE
+
+  INV_BASE_L db "Error: Invalid base_len", 0xA
+  INV_BASE_LEN_N equ $ - INV_BASE_L
 
 section .note.GNU-stack

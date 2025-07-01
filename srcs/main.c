@@ -12,6 +12,7 @@ extern char *ft_strcpy(char *dest, const char *src);
 extern int ft_strcmp(const char *s1, const char *s2);
 extern size_t ft_write(int fd, const void *buf, size_t count);
 extern size_t ft_read(int fd, const void *buf, size_t count);
+extern int ft_atoi_base(const char *str, const char *base);
 
 void test_strlen();
 void test_strdup();
@@ -19,6 +20,7 @@ void test_strcpy();
 void test_strcmp();
 void test_write();
 void test_read();
+void test_atoi_base();
 
 int main()
 {
@@ -39,6 +41,9 @@ int main()
   printf("\n");
 
   test_read();
+  printf("\n");
+
+  test_atoi_base();
   printf("\n");
 
   printf("✅ All tests passed!\n");
@@ -157,4 +162,26 @@ void test_read()
   read_bytes = ft_read(1, buf, -42);
   assert(read_bytes == (size_t)-1);
   printf("Returned -1 as expected, errno = %i Ok ✅ \n",errno);
+}
+
+void test_atoi_base()
+{
+  const char *str = "101010";
+  const char *base = "01";
+
+  printf("Testing ft_atoi_base with basic test: ");
+  int res = ft_atoi_base(str,base);
+  assert(res == 42);
+  printf("String to convert = \"%s\", base = \"%s\" , result = %i Ok ✅ \n", str, base, res);
+
+
+  printf("Testing ft_atoi_base with both null str and base: ");
+  res = ft_atoi_base(NULL,NULL);
+  assert(res == -1);
+  printf("String to convert = (null), base = (null) , result = %i Ok ✅ \n", res);
+
+  printf("Testing ft_atoi_base with null base: ");
+  res = ft_atoi_base("101010",NULL);
+  assert(res == -1);
+  printf("String to convert = (null), base = (null) , result = %i Ok ✅ \n", res);
 }
